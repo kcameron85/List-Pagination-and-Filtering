@@ -1,50 +1,106 @@
-/******************************************
-Treehouse Techdegree:
-FSJS project 2 - List Filter and Pagination
-******************************************/
-   
-// Study guide for this project - https://drive.google.com/file/d/1OD1diUsTMdpfMDv677TfL1xO2CEkykSz/view?usp=sharing
+const listItems = document.querySelectorAll('.student-item');
+const itemsPerPage = 10;
 
+/*
+	-Creates a funtion to show list items based on the listItems array and rhe pagination like clicked. 
+	-page is set to an intial value of 1 so only the first 10 items show on page load.
+*/
 
-/*** 
-   Add your global variables that store the DOM elements you will 
-   need to reference and/or manipulate. 
-   
-   But be mindful of which variables should be global and which 
-   should be locally scoped to one of the two main functions you're 
-   going to create. A good general rule of thumb is if the variable 
-   will only be used inside of a function, then it can be locally 
-   scoped to that function.
-***/
+const showPage = ( list, page ) =>  {
+	
+	//Creates a start and end value used to determin which list items to show.
+	let startIndex = (page * itemsPerPage) - itemsPerPage;
+	let endIndex = page * itemsPerPage;
 
+	/*
+		Loops through list items and sets the display value of the list items to 'block'  or 'none' based on
+		start and end index values.
+	*/
+	for ( i = 0; i < list.length; i++) {
 
+		if ( i >= startIndex && i < endIndex ){
+			list[ i ].style.display = 'block';
+		} else {
+			list[ i ].style.display = 'none';
+		}
 
+	}
 
-/*** 
-   Create the `showPage` function to hide all of the items in the 
-   list except for the ten you want to show.
+}
 
-   Pro Tips: 
-     - Keep in mind that with a list of 54 students, the last page 
-       will only display four.
-     - Remember that the first student has an index of 0.
-     - Remember that a function `parameter` goes in the parens when 
-       you initially define the function, and it acts as a variable 
-       or a placeholder to represent the actual function `argument` 
-       that will be passed into the parens later when you call or 
-       "invoke" the function 
-***/
+/*
+	Creates function that builds the DOM structure of the pagination links. This functions dynamically
+	adds pagination links based on the number of list items present on the webpage. 
+*/
+const appendPageLinks = (list) => {
+	const ul = document.createElement( 'ul' );
+	const div = document.createElement( 'div' );
+	const container = document.querySelector( '.page' );
+	const pageLinks = Math.ceil(list.length / itemsPerPage);
+	
+	//creating the pagination container and appending a <ul>
+	container.appendChild(div);
+	div.className = 'pagination';	
+	div.appendChild(ul);
+	
+	//creating pagination links and using for loop to add links based on pageLinks calculation
+	for ( i = 1; i <= pageLinks; i++ ) {
+		const a = document.createElement('a');
+		const li = document.createElement( 'li' );
+				
+		ul.appendChild(li);
+		li.appendChild(a).innerHTML = i;
+		a.href = '#';
 
+		//Adds 'active' class to first anchor tag initally
+		if ( i ===1 ) {
+			a.className = 'active';
+		} 
+		
+	}
+	
+	//Selecting all list items <a>'s that are grandchildren on the <ul> within <div> with .pagination class
+	const paginationAnchors = document.querySelectorAll( '.pagination ul li a' );
+	
+	//Looping through <li>'s and selecting <a>'s within them
+	for (i = 0; i < paginationAnchors.length; i++) {
+		
+		//adds an event listener to perform actions based on the pagination link selected
+		paginationAnchors[ i ].addEventListener('click', (e) => {
+			const targetAnchor = e.target;
+			const page = parseInt(targetAnchor.textContent);
+			
+			//Adds active class to pagination link selected
+			if ( targetAnchor.className = ' ' ) {
+				targetAnchor.classList.add('active');
+			} 
+			
+			/*
+				-Removes active class from all but the selected pagination link
+				-Adds # class to all pagination links except the one selected
+			*/
+			for ( i = 0; i < paginationAnchors.length; i++ ) {
+			
+				if ( paginationAnchors[ i ] !== e.target ){
+					paginationAnchors[ i ].classList.remove('active');
+				}
+			
+			}
+			
+			//Calls the showPage function to alter page base on selected pagination link
+			showPage(listItems, page);
+			
+		});
+		
+	}
 
+	return div;
 
+}
 
-/*** 
-   Create the `appendPageLinks function` to generate, append, and add 
-   functionality to the pagination buttons.
-***/
+//Inital function call to hide all but first 10 list items.
+showPage(listItems, 1);
 
+//Calls appendPageLinks function to create pagination and hide listItems 
+appendPageLinks(listItems);
 
-
-
-
-// Remember to delete the comments that came with this file, and replace them with your own code comments.
